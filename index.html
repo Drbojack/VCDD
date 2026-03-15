@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Startup Sticky Notes Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <section class="board-wrap">
+      <header class="topbar">
+        <div class="title-block">
+          <h1>Daily Startup Report</h1>
+          <p>Click a sticky note to open the company details.</p>
+        </div>
+
+        <div class="controls">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search company, sector, or summary..."
+            aria-label="Search companies"
+          />
+          <select id="sectorFilter" aria-label="Filter by sector">
+            <option value="all">All sectors</option>
+          </select>
+          <button id="reloadBtn" type="button">Reload</button>
+        </div>
+      </header>
+
+      <main id="board" class="board" aria-live="polite"></main>
+    </section>
+
+    <aside class="sidebar">
+      <div id="detailPanel" class="panel">
+        <div class="empty">
+          <h2>Company details</h2>
+          <p>Select a note on the left.</p>
+          <p>This is where your boss can read the summary, funding round, links, and any extra notes from OpenClaw.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

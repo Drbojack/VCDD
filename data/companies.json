@@ -1,0 +1,73 @@
+[
+  {
+    "id": "nova-robotics",
+    "name": "Nova Robotics",
+    "sector": "Robotics",
+    "summary": "Warehouse robotics startup building modular pick-and-pack systems for mid-market logistics operators.",
+    "round": "Series A",
+    "amount": "$18M",
+    "location": "Toronto, Canada",
+    "reportDate": "2026-03-15",
+    "color": "yellow",
+    "notes": "Strong commercial traction. Worth comparing against labor-shortage trends in fulfillment and retail logistics.",
+    "links": [
+      {
+        "label": "Company site",
+        "url": "https://example.com"
+      },
+      {
+        "label": "Funding article",
+        "url": "https://example.com/article"
+      }
+    ]
+  },
+  {
+    "id": "lattice-bio",
+    "name": "Lattice Bio",
+    "sector": "Biotech",
+    "summary": "Precision therapeutics company developing AI-assisted protein design workflows for inflammatory disease targets.",
+    "round": "Seed",
+    "amount": "$6.5M",
+    "location": "Boston, USA",
+    "reportDate": "2026-03-15",
+    "color": "pink",
+    "notes": "Early-stage but technically interesting. Might matter if your boss wants defensible science-heavy deals.",
+    "links": [
+      {
+        "label": "Company site",
+        "url": "https://example.com"
+      }
+    ]
+  },
+  {
+    "id": "sungrid-energy",
+    "name": "SunGrid Energy",
+    "sector": "Climate",
+    "summary": "Distributed energy platform helping commercial buildings optimize battery usage and grid participation.",
+    "round": "Series B",
+    "amount": "$42M",
+    "location": "Austin, USA",
+    "reportDate": "2026-03-15",
+    "color": "blue",
+    "notes": "Could be a repeat watchlist company if the daily reports keep surfacing climate infrastructure plays.",
+    "links": [
+      {
+        "label": "Coverage",
+        "url": "https://example.com"
+      }
+    ]
+  },
+  {
+    "id": "copper-health",
+    "name": "Copper Health",
+    "sector": "Healthtech",
+    "summary": "Remote care platform focused on post-surgery recovery tracking and patient engagement.",
+    "round": "Pre-Seed",
+    "amount": "$2.2M",
+    "location": "Vancouver, Canada",
+    "reportDate": "2026-03-15",
+    "color": "green",
+    "notes": "Smaller round, but maybe relevant if he wants fast-growing operators before they become crowded.",
+    "links": []
+  }
+]

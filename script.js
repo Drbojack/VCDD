@@ -2,51 +2,57 @@ const boardEl = document.getElementById("board");
 const detailPanelEl = document.getElementById("detailPanel");
 const searchInputEl = document.getElementById("searchInput");
 const sectorFilterEl = document.getElementById("sectorFilter");
+const dateFilterEl = document.getElementById("dateFilter");
+const clearFiltersBtnEl = document.getElementById("clearFiltersBtn");
 const reloadBtnEl = document.getElementById("reloadBtn");
 
-const NOTE_COLORS = ["yellow", "pink", "blue", "green", "purple"];
+const NOTE_COLORS = ["yellow","pink","blue","green","purple"];
 
 let companies = [];
 let filteredCompanies = [];
 
-async function loadCompanies() {
-  try {
-    const response = await fetch("./data/companies.json?ts=" + Date.now());
-    if (!response.ok) throw new Error("Could not load companies.json");
+async function loadCompanies(){
+  try{
+    const response = await fetch("./data/companies.json?ts="+Date.now());
+    if(!response.ok) throw new Error("Could not load companies.json");
 
     const data = await response.json();
     companies = Array.isArray(data) ? data : [];
+
     populateSectorFilter(companies);
     applyFilters();
-  } catch (error) {
+  }
+  catch(error){
     console.error(error);
     boardEl.innerHTML = `
       <div class="empty-state">
         <h3>Could not load the report data.</h3>
-        <p>Make sure <code>data/companies.json</code> exists and is valid JSON.</p>
+        <p>Make sure data/companies.json exists and is valid JSON.</p>
       </div>
     `;
   }
 }
 
-function populateSectorFilter(items) {
-  const existingValue = sectorFilterEl.value;
-  const sectors = [...new Set(items.map(item => item.sector).filter(Boolean))].sort();
+function populateSectorFilter(items){
+  const sectors = [...new Set(items.map(i=>i.sector).filter(Boolean))].sort();
 
-  sectorFilterEl.innerHTML = '<option value="all">All sectors</option>' +
-    sectors.map(sector => `<option value="${escapeHtml(sector)}">${escapeHtml(sector)}</option>`).join("");
-
-  if (sectors.includes(existingValue)) {
-    sectorFilterEl.value = existingValue;
-  }
+  sectorFilterEl.innerHTML =
+    '<option value="all">All sectors</option>' +
+    sectors.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join("");
 }
 
-function applyFilters() {
+function applyFilters(){
+
   const searchTerm = searchInputEl.value.trim().toLowerCase();
   const sectorValue = sectorFilterEl.value;
+  const dateValue = dateFilterEl.value;
 
-  filteredCompanies = companies.filter(company => {
-    const matchesSector = sectorValue === "all" || company.sector === sectorValue;
+  filteredCompanies = companies.filter(company=>{
+
+    const matchesSector = sectorValue==="all" || company.sector===sectorValue;
+
+    const matchesDate = !dateValue || normalizeDate(company.reportDate)===dateValue;
+
     const blob = [
       company.name,
       company.sector,
@@ -56,25 +62,29 @@ function applyFilters() {
     ].join(" ").toLowerCase();
 
     const matchesSearch = !searchTerm || blob.includes(searchTerm);
-    return matchesSector && matchesSearch;
+
+    return matchesSector && matchesDate && matchesSearch;
   });
 
   renderBoard(filteredCompanies);
 }
 
-function renderBoard(items) {
-  if (!items.length) {
+function renderBoard(items){
+
+  if(!items.length){
     boardEl.innerHTML = `
       <div class="empty-state">
         <h3>No sticky notes found.</h3>
-        <p>Try changing the search or sector filter.</p>
+        <p>Try changing the filters.</p>
       </div>
     `;
     return;
   }
 
-  boardEl.innerHTML = items.map((company, index) => {
-    const color = company.color && NOTE_COLORS.includes(company.color)
+  boardEl.innerHTML = items.map((company,index)=>{
+
+    const color =
+      company.color && NOTE_COLORS.includes(company.color)
       ? company.color
       : NOTE_COLORS[index % NOTE_COLORS.length];
 
@@ -82,30 +92,29 @@ function renderBoard(items) {
       <button class="note ${color}" data-id="${escapeHtml(company.id)}" type="button">
         <div>
           <h3>${escapeHtml(company.name)}</h3>
-          <p>${escapeHtml(truncate(company.summary, 110))}</p>
+          <p>${escapeHtml(truncate(company.summary,110))}</p>
         </div>
         <div class="note-meta">
           <span class="tag">${escapeHtml(company.sector || "Company")}</span>
-          <span>${escapeHtml(company.round || "")}</span>
+          <span>${escapeHtml(company.reportDate || "")}</span>
         </div>
       </button>
     `;
   }).join("");
 
-  document.querySelectorAll(".note").forEach(note => {
-    note.addEventListener("click", () => {
-      const company = companies.find(item => item.id === note.dataset.id);
-      if (company) renderDetails(company);
+  document.querySelectorAll(".note").forEach(note=>{
+    note.addEventListener("click",()=>{
+      const company = companies.find(i=>i.id===note.dataset.id);
+      if(company) renderDetails(company);
     });
   });
 }
 
-function renderDetails(company) {
-  const articleLinks = (company.links || [])
-    .map(link => `
-      <a href="${escapeAttribute(link.url)}" target="_blank" rel="noopener noreferrer">
-        ${escapeHtml(link.label || "Open link")}
-      </a>
+function renderDetails(company){
+
+  const links = (company.links || [])
+    .map(link=>`
+      <a href="${escapeAttr(link.url)}" target="_blank">${escapeHtml(link.label)}</a>
     `)
     .join("");
 
@@ -119,46 +128,63 @@ function renderDetails(company) {
         <strong>Funding round</strong>
         <span>${escapeHtml(company.round || "—")}</span>
       </div>
+
       <div class="meta-item">
         <strong>Amount</strong>
         <span>${escapeHtml(company.amount || "—")}</span>
       </div>
+
       <div class="meta-item">
         <strong>Location</strong>
         <span>${escapeHtml(company.location || "—")}</span>
       </div>
+
       <div class="meta-item">
         <strong>Report date</strong>
         <span>${escapeHtml(company.reportDate || "—")}</span>
       </div>
     </div>
 
-    ${articleLinks ? `<div class="links">${articleLinks}</div>` : ""}
+    ${links ? `<div class="links">${links}</div>` : ""}
 
-    ${company.notes ? `<div class="detail-notes"><strong>OpenClaw notes:</strong><br>${escapeHtml(company.notes)}</div>` : ""}
+    ${company.notes ? `<div class="detail-notes">${escapeHtml(company.notes)}</div>` : ""}
   `;
 }
 
-function truncate(text, maxLength) {
-  if (!text) return "";
-  return text.length > maxLength ? text.slice(0, maxLength - 1) + "…" : text;
+function normalizeDate(value){
+  if(!value) return "";
+  return String(value).slice(0,10);
 }
 
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+function truncate(text,max){
+  if(!text) return "";
+  return text.length>max ? text.slice(0,max-1)+"…" : text;
 }
 
-function escapeAttribute(value) {
-  return String(value ?? "").replaceAll('"', "&quot;");
+function escapeHtml(v){
+  return String(v ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
 }
 
-searchInputEl.addEventListener("input", applyFilters);
-sectorFilterEl.addEventListener("change", applyFilters);
-reloadBtnEl.addEventListener("click", loadCompanies);
+function escapeAttr(v){
+  return String(v ?? "").replaceAll('"',"&quot;");
+}
+
+searchInputEl.addEventListener("input",applyFilters);
+sectorFilterEl.addEventListener("change",applyFilters);
+dateFilterEl.addEventListener("change",applyFilters);
+
+clearFiltersBtnEl.addEventListener("click",()=>{
+  searchInputEl.value="";
+  sectorFilterEl.value="all";
+  dateFilterEl.value="";
+  applyFilters();
+});
+
+reloadBtnEl.addEventListener("click",loadCompanies);
 
 loadCompanies();
